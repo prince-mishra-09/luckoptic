@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Glasses, FolderHeart, ShoppingBag, Eye, LogOut, ShieldAlert, ArrowLeft, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Glasses, FolderHeart, ShoppingBag, Eye, LogOut, ShieldAlert, ArrowLeft, Menu, X, CreditCard } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function AdminLayout({ children }) {
@@ -80,6 +80,7 @@ export default function AdminLayout({ children }) {
     { name: 'Manage Products', href: '/admin/products', icon: <Glasses size={18} /> },
     { name: 'Manage Categories', href: '/admin/categories', icon: <FolderHeart size={18} /> },
     { name: 'Manage Lens Types', href: '/admin/lenses', icon: <Eye size={18} /> },
+    { name: 'Manage Payments', href: '/admin/payments', icon: <CreditCard size={18} /> },
     { name: 'Manage Orders', href: '/admin/orders', icon: <ShoppingBag size={18} /> }
   ];
 

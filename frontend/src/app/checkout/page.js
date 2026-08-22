@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, MapPin, Truck, CheckCircle, ShieldCheck, Plus, AlertCircle, ArrowLeft, Heart } from 'lucide-react';
+import { ShoppingBag, MapPin, Truck, CheckCircle, ShieldCheck, Plus, AlertCircle, ArrowLeft, Heart, CreditCard } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 
@@ -17,8 +17,26 @@ export default function Checkout() {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [createdOrder, setCreatedOrder] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+  useEffect(() => {
+    async function loadPaymentMethods() {
+      try {
+        const res = await fetch(`${API_URL}/payment-methods`);
+        const data = await res.json();
+        if (data.success && data.methods.length > 0) {
+          setPaymentMethods(data.methods);
+          setSelectedPaymentMethod(data.methods[0].name);
+        }
+      } catch (err) {
+        console.error('Failed to load payment methods:', err);
+      }
+    }
+    loadPaymentMethods();
+  }, [API_URL]);
 
   // Auth & Cart Check Guards
   useEffect(() => {
@@ -86,7 +104,8 @@ export default function Checkout() {
             state: targetAddress.state,
             zipCode: targetAddress.zipCode,
             country: targetAddress.country
-          }
+          },
+          paymentMethod: selectedPaymentMethod
         })
       });
 
@@ -150,7 +169,7 @@ export default function Checkout() {
             <p>{createdOrder.shippingAddress.city}, {createdOrder.shippingAddress.state} - {createdOrder.shippingAddress.zipCode}</p>
           </div>
           <div className="flex justify-between items-center pt-3 border-t border-gray-50 font-bold text-luckoptics-dark text-sm">
-            <span>Amount to Pay (COD):</span>
+            <span>Amount to Pay ({createdOrder.paymentMethod}):</span>
             <span className="font-sans">₹{createdOrder.totalAmount}</span>
           </div>
         </div>
@@ -296,21 +315,51 @@ export default function Checkout() {
           </div>
 
           {/* 2. Payment Method Selector */}
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-xs space-y-4">
+          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-xs space-y-4 font-display">
             <h3 className="font-display font-bold text-base text-luckoptics-dark border-b border-gray-50 pb-3">2. Payment Method</h3>
-            <div className="border border-luckoptics-primary bg-luckoptics-primary/5 p-4 rounded-2xl flex items-center justify-between">
-              <div className="flex gap-3 items-center">
-                <div className="p-2.5 bg-luckoptics-primary text-white rounded-xl">
-                  <Truck size={18} />
+            <div className="grid grid-cols-1 gap-3">
+              {(paymentMethods.length > 0 ? paymentMethods : [
+                { name: 'Cash on Delivery (COD)', desc: 'Pay cash upon inspecting your product delivery.' }
+              ]).map((method) => (
+                <div key={method.name} className="space-y-3">
+                  <div
+                    onClick={() => setSelectedPaymentMethod(method.name)}
+                    className={`border p-4 rounded-2xl cursor-pointer transition-all flex items-center justify-between ${
+                      selectedPaymentMethod === method.name
+                        ? 'border-luckoptics-primary bg-luckoptics-primary/5 ring-1 ring-luckoptics-primary'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex gap-3 items-center">
+                      <div className={`p-2.5 rounded-xl transition-all ${
+                        selectedPaymentMethod === method.name ? 'bg-luckoptics-primary text-white' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        <CreditCard size={18} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-800">{method.name}</h4>
+                        <p className="text-[10px] text-gray-400">{method.desc}</p>
+                      </div>
+                    </div>
+                    {selectedPaymentMethod === method.name && (
+                      <span className="bg-luckoptics-primary text-white p-0.5 rounded-full">
+                        <CheckCircle size={14} />
+                      </span>
+                    )}
+                  </div>
+
+                  {/* QR Code display if active option has one */}
+                  {selectedPaymentMethod === method.name && method.qrCode && (
+                    <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl flex flex-col items-center justify-center text-center animate-in fade-in duration-200 max-w-xs mx-auto">
+                      <span className="text-[9px] font-bold text-luckoptics-primary uppercase tracking-wider mb-2">Scan & Pay Now</span>
+                      <div className="w-40 h-40 bg-white border border-gray-200 rounded-xl p-2 flex items-center justify-center shadow-xs">
+                        <img src={method.qrCode} alt="QR Code Payment" className="w-full h-full object-contain" />
+                      </div>
+                      <p className="text-[9px] text-gray-400 mt-2">Scan this QR code using PhonePe, GPay, Paytm, or any UPI app to complete your payment.</p>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <h4 className="text-xs font-bold text-gray-800">Cash on Delivery (COD)</h4>
-                  <p className="text-[10px] text-gray-400">Pay cash upon inspecting your product delivery.</p>
-                </div>
-              </div>
-              <span className="bg-luckoptics-primary text-white p-0.5 rounded-full">
-                <CheckCircle size={14} />
-              </span>
+              ))}
             </div>
           </div>
         </div>

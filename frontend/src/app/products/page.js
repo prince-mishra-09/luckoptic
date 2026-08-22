@@ -54,6 +54,14 @@ function ProductListContent() {
         if (data.success) {
           setProducts(data.products);
           setTotalProducts(data.pagination?.total || data.products.length);
+          
+          // Restore scroll position
+          const savedScroll = sessionStorage.getItem(`scroll_${queryParams.toString()}`);
+          if (savedScroll) {
+            setTimeout(() => {
+              window.scrollTo(0, parseInt(savedScroll, 10));
+            }, 100);
+          }
         }
       } catch (err) {
         console.error(err);
@@ -63,6 +71,26 @@ function ProductListContent() {
     }
     loadProducts();
   }, [searchParams, API_URL]);
+
+  // Save scroll position when user scrolls
+  useEffect(() => {
+    const handleScroll = () => {
+      const queryParams = new URLSearchParams(searchParams);
+      sessionStorage.setItem(`scroll_${queryParams.toString()}`, window.scrollY.toString());
+    };
+    
+    let timeoutId;
+    const debouncedScroll = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleScroll, 100);
+    };
+
+    window.addEventListener('scroll', debouncedScroll);
+    return () => {
+      window.removeEventListener('scroll', debouncedScroll);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [searchParams]);
 
   const updateFilter = (key, value) => {
     const params = new URLSearchParams(searchParams);

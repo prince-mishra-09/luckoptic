@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Search, ShoppingCart, User, Phone, LogOut, ChevronDown, Glasses, Menu, X, Heart } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { Search, ShoppingCart, User, Phone, LogOut, ChevronDown, Glasses, Menu, X, Heart, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 
@@ -15,6 +15,7 @@ export default function Header() {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const searchRef = useRef(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -93,13 +94,25 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-6">
           
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <img 
-              src="https://ik.imagekit.io/bzdikkis8/luckoptic-logo.png" 
-              alt="LuckOptics Logo" 
-              className="h-10 w-auto object-contain"
-            />
-          </Link>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {pathname !== '/' && (
+              <button
+                onClick={() => router.back()}
+                className="p-1 hover:bg-gray-100 rounded-lg lg:hidden text-luckoptics-dark cursor-pointer mr-0.5"
+                title="Go Back"
+                suppressHydrationWarning
+              >
+                <ArrowLeft size={20} />
+              </button>
+            )}
+            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+              <img 
+                src="https://ik.imagekit.io/bzdikkis8/luckoptic-logo.png" 
+                alt="LuckOptics Logo" 
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
+          </div>
 
           {/* Navigation Links (Middle section matching screenshot categories) */}
           <nav className="hidden lg:flex items-center gap-6 font-display font-extrabold text-[11px] uppercase tracking-wider text-luckoptics-dark">
@@ -163,6 +176,15 @@ export default function Header() {
 
             {/* Quick Icons */}
             <div className="flex items-center gap-3.5 flex-shrink-0 text-luckoptics-dark">
+              {user?.role === 'admin' && (
+                <Link
+                  href="/admin"
+                  className="bg-luckoptics-primary text-white font-bold text-[10px] px-3.5 py-2 rounded-full shadow-xs hover:bg-luckoptics-primary/90 transition-all uppercase tracking-wider flex items-center gap-1 cursor-pointer font-display leading-none"
+                  suppressHydrationWarning
+                >
+                  Dashboard
+                </Link>
+              )}
               
               {/* Wishlist Link placeholder */}
               <Link href={user ? "/wishlist" : "/login?redirect=/wishlist"} className="hover:text-luckoptics-primary transition-colors block">
@@ -275,6 +297,17 @@ export default function Header() {
           </form>
 
           <div className="flex flex-col gap-2.5 font-display font-bold text-xs uppercase tracking-wider pb-2">
+            {user?.role === 'admin' && (
+              <Link 
+                href="/admin" 
+                onClick={() => setMobileMenuOpen(false)} 
+                className="px-2.5 py-2.5 bg-luckoptics-primary/10 text-luckoptics-primary hover:bg-luckoptics-primary/15 rounded-lg font-extrabold flex items-center justify-between border border-luckoptics-primary/20"
+                suppressHydrationWarning
+              >
+                <span>Admin Dashboard</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-luckoptics-primary animate-ping"></span>
+              </Link>
+            )}
             <Link href="/products?category=Eyeglasses" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 hover:bg-gray-50 hover:text-luckoptics-primary rounded-lg text-gray-600">Eyeglasses</Link>
             <Link href="/products?category=Sunglasses" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 hover:bg-gray-50 hover:text-luckoptics-primary rounded-lg text-gray-600">Sunglasses</Link>
             <Link href="/products?category=Screen Glasses" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 hover:bg-gray-50 hover:text-luckoptics-primary rounded-lg text-gray-600">Screen Glasses</Link>

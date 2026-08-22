@@ -52,8 +52,7 @@ const OrderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['COD'],
-    default: 'COD'
+    default: 'Cash on Delivery (COD)'
   },
   totalAmount: {
     type: Number,
