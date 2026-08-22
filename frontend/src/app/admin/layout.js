@@ -84,12 +84,14 @@ export default function AdminLayout({ children }) {
       <aside className="w-64 bg-luckoptics-dark text-white flex-shrink-0 hidden md:flex flex-col justify-between p-6 border-r border-gray-800">
         <div className="space-y-8">
           {/* Brand header */}
-          <div className="flex items-center gap-2 border-b border-white/10 pb-4">
-            <span className="p-1.5 bg-white/10 rounded-lg text-white">
-              <Glasses size={20} className="text-luckoptics-primary" />
-            </span>
+          <div className="flex items-center gap-2.5 border-b border-white/10 pb-4">
+            <img 
+              src="https://ik.imagekit.io/bzdikkis8/luckoptic-logo.png" 
+              alt="LuckOptics Logo" 
+              className="h-8 w-auto object-contain bg-white p-0.5 rounded-md" 
+            />
             <div>
-              <h3 className="font-display font-bold text-sm leading-none">LuckOptics</h3>
+              <h3 className="font-display font-bold text-sm leading-none text-white">LuckOptics</h3>
               <span className="text-[9px] text-luckoptics-gold font-bold uppercase tracking-wider">Admin Panel</span>
             </div>
           </div>
@@ -144,7 +146,16 @@ export default function AdminLayout({ children }) {
         <header className="bg-white border-b border-gray-100 py-3.5 px-6 flex justify-between items-center">
           <div className="flex items-center gap-4">
             {/* Mobile Title */}
-            <h1 className="font-display font-black text-base text-luckoptics-dark md:hidden">Luck Admin</h1>
+            <div className="flex items-center gap-2 md:hidden">
+              <img 
+                src="https://ik.imagekit.io/bzdikkis8/luckoptic-logo.png" 
+                alt="LuckOptics Logo" 
+                className="h-7 w-auto object-contain" 
+              />
+              <span className="font-display font-black text-sm tracking-tight text-luckoptics-dark">
+                Luck Admin
+              </span>
+            </div>
             <span className="hidden md:inline text-xs font-bold text-gray-400 uppercase tracking-wider">
               Control Center
             </span>

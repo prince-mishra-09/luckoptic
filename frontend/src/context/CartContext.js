@@ -1,9 +1,13 @@
 'use client';
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const router = useRouter();
+  const { user, loading } = useAuth();
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
@@ -52,6 +56,14 @@ export const CartProvider = ({ children }) => {
     }
   }, [cart, isLoaded]);
 
+  // Clear cart when user logs out
+  useEffect(() => {
+    if (!loading && !user) {
+      setCart([]);
+      localStorage.removeItem('cart');
+    }
+  }, [user, loading]);
+
   // Check if two prescriptions are identical
   const isSamePrescription = (p1, p2) => {
     if (!p1 && !p2) return true;
@@ -71,6 +83,13 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = (product, quantity = 1, hasPrescription = false, prescription = null) => {
+    if (!user) {
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname + window.location.search;
+        router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      }
+      return;
+    }
     setCart((prevCart) => {
       // Find if item already exists in cart with matching prescription
       const existingItemIndex = prevCart.findIndex(
