@@ -67,22 +67,14 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 w-full z-40 bg-white border-b border-gray-100 shadow-xs">
       
-      {/* Top Banner (White minimal bar with grey links matching screenshot) */}
+      {/* Top Banner (White minimal bar with marquee scrolling) */}
       <div className="bg-white text-gray-500 border-b border-gray-100 text-[10px] py-2 px-6 flex justify-between items-center hidden lg:flex font-medium">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="hover:text-luckoptics-primary transition-colors">Corporate</Link>
-          <span>|</span>
-          <Link href="/contact" className="hover:text-luckoptics-primary transition-colors">Store Locator</Link>
-          <span>|</span>
-          <span className="text-gray-400">Singapore</span>
-          <span>|</span>
-          <span className="text-gray-400">UAE</span>
-          <span>|</span>
-          <Link href="/about" className="hover:text-luckoptics-primary transition-colors">About Us</Link>
-          <span>|</span>
-          <span className="text-gray-400 font-semibold text-luckoptics-primary">Certified Eye-Care Partner</span>
+        <div className="flex-1 mr-[2px] overflow-hidden">
+          <marquee className="text-luckoptics-primary font-semibold text-[11px]" scrollamount="6">
+            ✨ Welcome to LuckOptics – Your Premium Eye-Care Partner! | 👓 High-Quality Eyeglasses, Sunglasses, Screen Glasses & Kids Glasses | 🚚 Free Shipping & 14-Day Easy Returns | 🏠 Book a Free Try-At-Home session today! | 📞 Call us for support: 99998 99998 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ✨ Welcome to LuckOptics – Your Premium Eye-Care Partner! | 👓 High-Quality Eyeglasses, Sunglasses, Screen Glasses & Kids Glasses | 🚚 Free Shipping & 14-Day Easy Returns | 🏠 Book a Free Try-At-Home session today! | 📞 Call us for support: 99998 99998 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ✨ Welcome to LuckOptics – Your Premium Eye-Care Partner! | 👓 High-Quality Eyeglasses, Sunglasses, Screen Glasses & Kids Glasses | 🚚 Free Shipping & 14-Day Easy Returns | 🏠 Book a Free Try-At-Home session today! | 📞 Call us for support: 99998 99998
+          </marquee>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-shrink-0">
           <span className="flex items-center gap-1 text-gray-600 font-semibold">
             <Phone size={12} className="text-luckoptics-primary" />
             99998 99998
