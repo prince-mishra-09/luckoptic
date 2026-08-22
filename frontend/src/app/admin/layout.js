@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Glasses, FolderHeart, ShoppingBag, Eye, LogOut, ShieldAlert, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, Glasses, FolderHeart, ShoppingBag, Eye, LogOut, ShieldAlert, ArrowLeft, Menu, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function AdminLayout({ children }) {
@@ -11,6 +11,11 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
 
   const [authorized, setAuthorized] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!loading) {
@@ -80,6 +85,80 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      {/* Mobile Menu Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex md:hidden bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in">
+          <div className="w-64 bg-luckoptics-dark text-white p-6 flex flex-col justify-between h-full shadow-2xl relative animate-in slide-in-from-left duration-300">
+            {/* Close Button */}
+            <button 
+              onClick={() => setMobileMenuOpen(false)}
+              className="absolute top-4 right-4 p-1 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-gray-400 hover:text-white"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="space-y-8">
+              {/* Brand header */}
+              <div className="flex items-center gap-2.5 border-b border-white/10 pb-4 pr-6">
+                <img 
+                  src="https://ik.imagekit.io/bzdikkis8/luckoptic-logo.png" 
+                  alt="LuckOptics Logo" 
+                  className="h-8 w-auto object-contain bg-white p-0.5 rounded-md" 
+                />
+                <div>
+                  <h3 className="font-display font-bold text-sm leading-none text-white">LuckOptics</h3>
+                  <span className="text-[9px] text-luckoptics-gold font-bold uppercase tracking-wider">Admin Panel</span>
+                </div>
+              </div>
+
+              {/* Links */}
+              <nav className="space-y-1.5">
+                {menuItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+                        isActive
+                          ? 'bg-luckoptics-primary text-white shadow-lg shadow-luckoptics-primary/10'
+                          : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      {item.icon}
+                      <span>{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="space-y-2 border-t border-white/10 pt-4">
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-white px-4 py-2 transition-colors"
+              >
+                <ArrowLeft size={16} />
+                <span>Go to Shop Website</span>
+              </Link>
+              <button
+                onClick={() => {
+                  logout();
+                  router.push('/login');
+                }}
+                className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-red-400 hover:bg-red-950/20 rounded-xl transition-all cursor-pointer"
+              >
+                <LogOut size={16} />
+                <span>Log Out</span>
+              </button>
+            </div>
+          </div>
+          {/* Backdrop Click Closes Menu */}
+          <div className="flex-grow cursor-pointer" onClick={() => setMobileMenuOpen(false)}></div>
+        </div>
+      )}
+
       {/* Sidebar (Desktop) */}
       <aside className="w-64 bg-luckoptics-dark text-white flex-shrink-0 hidden md:flex flex-col justify-between p-6 border-r border-gray-800">
         <div className="space-y-8">
@@ -144,7 +223,16 @@ export default function AdminLayout({ children }) {
       <div className="flex-grow flex flex-col min-w-0">
         {/* Top Header (Mobile menu trigger & User detail) */}
         <header className="bg-white border-b border-gray-100 py-3.5 px-6 flex justify-between items-center">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Hamburger trigger */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-1.5 hover:bg-gray-100 rounded-xl text-gray-600 md:hidden transition-colors cursor-pointer"
+              title="Open Navigation Menu"
+            >
+              <Menu size={20} />
+            </button>
+
             {/* Mobile Title */}
             <div className="flex items-center gap-2 md:hidden">
               <img 
