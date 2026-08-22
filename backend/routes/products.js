@@ -88,6 +88,10 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/:id', async (req, res) => {
   try {
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
     const product = await Product.findById(req.params.id).populate('category', 'name slug');
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
