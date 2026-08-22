@@ -19,7 +19,11 @@ router.post('/', protect, async (req, res) => {
     const itemsWithPricing = [];
 
     // Verify stock and calculate total price
+    const mongoose = require('mongoose');
     for (const item of items) {
+      if (!mongoose.Types.ObjectId.isValid(item.product)) {
+        return res.status(400).json({ success: false, message: `Invalid product ID format: ${item.product}` });
+      }
       const product = await Product.findById(item.product);
       if (!product) {
         return res.status(404).json({ success: false, message: `Product ${item.product} not found` });
