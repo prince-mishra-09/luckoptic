@@ -28,6 +28,10 @@ export default function AdminProducts() {
     gender: 'Men',
     color: '',
     size: 'Medium',
+    frameWidth: '',
+    templeLength: '',
+    noseBridge: '',
+    weight: '',
     featured: false
   });
 
@@ -161,6 +165,10 @@ export default function AdminProducts() {
       gender: product.gender,
       color: product.color,
       size: product.size,
+      frameWidth: product.frameWidth || '',
+      templeLength: product.templeLength || '',
+      noseBridge: product.noseBridge || '',
+      weight: product.weight || '',
       featured: product.featured || false
     });
     setShowForm(true);
@@ -214,6 +222,10 @@ export default function AdminProducts() {
           gender: 'Men',
           color: '',
           size: 'Medium',
+          frameWidth: '',
+          templeLength: '',
+          noseBridge: '',
+          weight: '',
           featured: false
         });
         loadData();
@@ -444,6 +456,29 @@ export default function AdminProducts() {
                 <select name="size" className="w-full bg-white border border-gray-200 rounded-lg p-2 focus:outline-hidden" value={formData.size} onChange={handleInputChange}>
                   {['Small', 'Medium', 'Wide'].map(opt => <option key={opt} value={opt}>{opt}</option>)}
                 </select>
+              </div>
+            </div>
+
+            {/* Physical Dimensions & Weight */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-100 text-xs">
+              <div>
+                <label className="block font-bold text-gray-400 uppercase mb-1.5">Frame Width</label>
+                <input type="text" name="frameWidth" placeholder="e.g. 138 mm" className="w-full bg-white border border-gray-200 rounded-lg p-2 focus:outline-hidden" value={formData.frameWidth} onChange={handleInputChange} />
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-400 uppercase mb-1.5">Temple Length</label>
+                <input type="text" name="templeLength" placeholder="e.g. 140 mm" className="w-full bg-white border border-gray-200 rounded-lg p-2 focus:outline-hidden" value={formData.templeLength} onChange={handleInputChange} />
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-400 uppercase mb-1.5">Nose Bridge</label>
+                <input type="text" name="noseBridge" placeholder="e.g. 18 mm" className="w-full bg-white border border-gray-200 rounded-lg p-2 focus:outline-hidden" value={formData.noseBridge} onChange={handleInputChange} />
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-400 uppercase mb-1.5">Weight</label>
+                <input type="text" name="weight" placeholder="e.g. 18.5g (Ultra-Light)" className="w-full bg-white border border-gray-200 rounded-lg p-2 focus:outline-hidden" value={formData.weight} onChange={handleInputChange} />
               </div>
             </div>
 

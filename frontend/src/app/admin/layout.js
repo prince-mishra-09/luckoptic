@@ -74,6 +74,7 @@ export default function AdminLayout({ children }) {
     { name: 'Dashboard Stats', href: '/admin', icon: <LayoutDashboard size={18} /> },
     { name: 'Manage Products', href: '/admin/products', icon: <Glasses size={18} /> },
     { name: 'Manage Categories', href: '/admin/categories', icon: <FolderHeart size={18} /> },
+    { name: 'Manage Lens Types', href: '/admin/lenses', icon: <Eye size={18} /> },
     { name: 'Manage Orders', href: '/admin/orders', icon: <ShoppingBag size={18} /> }
   ];
 

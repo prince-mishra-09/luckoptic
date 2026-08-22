@@ -11,6 +11,7 @@ const categoryRoutes = require('./routes/categories');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const uploadRoutes = require('./routes/upload');
+const lensRoutes = require('./routes/lenses');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/lenses', lensRoutes);
 
 // Root test endpoint
 app.get('/', (req, res) => {

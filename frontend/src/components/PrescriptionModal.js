@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Check } from 'lucide-react';
 
 export default function PrescriptionModal({ isOpen, onClose, onSubmit, product }) {
@@ -8,13 +8,49 @@ export default function PrescriptionModal({ isOpen, onClose, onSubmit, product }
   
   const [leftEye, setLeftEye] = useState({ sphere: '0.00', cylinder: '0.00', axis: '', add: '' });
   const [rightEye, setRightEye] = useState({ sphere: '0.00', cylinder: '0.00', axis: '', add: '' });
+  const [lenses, setLenses] = useState([]);
+
+  const fallbackLenses = [
+    { name: 'Zero Power', desc: 'Anti-Glare / Screen Protect', price: 0, isPrescriptionRequired: false },
+    { name: 'Single Vision', desc: 'Distance or Reading power', price: 500, isPrescriptionRequired: true },
+    { name: 'Bifocal/Progressive', desc: 'Dual power prescription', price: 1000, isPrescriptionRequired: true }
+  ];
+
+  useEffect(() => {
+    async function fetchLenses() {
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const res = await fetch(`${API_URL}/lenses`);
+        const data = await res.json();
+        if (data.success && data.lenses.length > 0) {
+          setLenses(data.lenses);
+          // Set first lens as default on load if it's 'Single Vision' but not in DB
+          const hasSingle = data.lenses.some(l => l.name === 'Single Vision');
+          if (!hasSingle) {
+            setLensType(data.lenses[0].name);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load lenses:", err);
+      }
+    }
+    if (isOpen) {
+      fetchLenses();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
+
+  const currentLenses = lenses.length > 0 ? lenses : fallbackLenses;
+  const selectedLensObj = currentLenses.find(l => l.name === lensType);
+  const isPrescriptionRequired = selectedLensObj ? selectedLensObj.isPrescriptionRequired : true;
+  const isProgressive = lensType.toLowerCase().includes('progressive') || lensType.toLowerCase().includes('bifocal');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const prescriptionData = {
       lensType,
+      lensPrice: selectedLensObj ? selectedLensObj.price : 0,
       pupilDistance,
       leftEye,
       rightEye
@@ -46,11 +82,7 @@ export default function PrescriptionModal({ isOpen, onClose, onSubmit, product }
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-3">1. Select Lens Type</label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {[
-                { name: 'Zero Power', desc: 'Anti-Glare / Screen Protect', price: 'Free' },
-                { name: 'Single Vision', desc: 'Distance or Reading power', price: '₹500' },
-                { name: 'Bifocal/Progressive', desc: 'Dual power prescription', price: '₹1000' }
-              ].map((type) => (
+              {currentLenses.map((type) => (
                 <div
                   key={type.name}
                   onClick={() => setLensType(type.name)}
@@ -69,14 +101,16 @@ export default function PrescriptionModal({ isOpen, onClose, onSubmit, product }
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mb-3">{type.desc}</p>
-                  <span className="text-xs font-bold text-luckoptics-primary">{type.price}</span>
+                  <span className="text-xs font-bold text-luckoptics-primary">
+                    {type.price === 0 || type.price === 'Free' ? 'Free' : `₹${type.price}`}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Step 2: Prescription Powers (Conditional) */}
-          {lensType !== 'Zero Power' && (
+          {isPrescriptionRequired && (
             <div className="space-y-4">
               <label className="block text-sm font-bold text-gray-700">2. Enter Prescription Details</label>
               
@@ -88,7 +122,7 @@ export default function PrescriptionModal({ isOpen, onClose, onSubmit, product }
                       <th className="p-3">Sphere (SPH)</th>
                       <th className="p-3">Cylinder (CYL)</th>
                       <th className="p-3">Axis (AX)</th>
-                      {lensType === 'Bifocal/Progressive' && <th className="p-3">Add</th>}
+                      {isProgressive && <th className="p-3">Add</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -125,7 +159,7 @@ export default function PrescriptionModal({ isOpen, onClose, onSubmit, product }
                           required={rightEye.cylinder !== '0.00'}
                         />
                       </td>
-                      {lensType === 'Bifocal/Progressive' && (
+                      {isProgressive && (
                         <td className="p-3">
                           <input
                             type="text"
@@ -171,7 +205,7 @@ export default function PrescriptionModal({ isOpen, onClose, onSubmit, product }
                           required={leftEye.cylinder !== '0.00'}
                         />
                       </td>
-                      {lensType === 'Bifocal/Progressive' && (
+                      {isProgressive && (
                         <td className="p-3">
                           <input
                             type="text"

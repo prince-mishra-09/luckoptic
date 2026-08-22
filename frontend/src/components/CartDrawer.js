@@ -25,7 +25,10 @@ export default function CartDrawer() {
 
   if (!isCartOpen) return null;
 
-  const getLensPrice = (type) => {
+  const getLensPrice = (type, prescription) => {
+    if (prescription && typeof prescription.lensPrice === 'number') {
+      return prescription.lensPrice;
+    }
     if (type === 'Single Vision') return 500;
     if (type === 'Bifocal/Progressive') return 1000;
     return 0;
@@ -72,7 +75,7 @@ export default function CartDrawer() {
           ) : (
             cart.map((item, index) => {
               const basePrice = item.product.discountPrice || item.product.price;
-              const lensPrice = item.hasPrescription ? getLensPrice(item.prescription?.lensType) : 0;
+              const lensPrice = item.hasPrescription ? getLensPrice(item.prescription?.lensType, item.prescription) : 0;
               const singleItemTotal = basePrice + lensPrice;
 
               return (

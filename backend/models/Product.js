@@ -61,6 +61,22 @@ const ProductSchema = new mongoose.Schema({
     enum: ['Small', 'Medium', 'Wide'],
     required: [true, 'Please select frame size']
   },
+  frameWidth: {
+    type: String,
+    default: ''
+  },
+  templeLength: {
+    type: String,
+    default: ''
+  },
+  noseBridge: {
+    type: String,
+    default: ''
+  },
+  weight: {
+    type: String,
+    default: ''
+  },
   featured: {
     type: Boolean,
     default: false

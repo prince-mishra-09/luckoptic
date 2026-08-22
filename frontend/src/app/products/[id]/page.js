@@ -23,6 +23,7 @@ export default function ProductDetail() {
   const [activeImage, setActiveImage] = useState('');
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
   const [showMoreDetails, setShowMoreDetails] = useState(false);
+  const [showFullDesc, setShowFullDesc] = useState(false);
   const [similarProducts, setSimilarProducts] = useState([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -91,7 +92,10 @@ export default function ProductDetail() {
     );
   }
 
-  const { name, description, price, discountPrice, stock, shape, material, frameType, gender, color, size, ratings } = product;
+  const {
+    name, description, price, discountPrice, stock, shape, material, frameType, gender, color, size, ratings,
+    frameWidth, templeLength, noseBridge, weight
+  } = product;
   const activePrice = discountPrice || price;
   const isOutOfStock = stock === 0;
 
@@ -208,7 +212,15 @@ export default function ProductDetail() {
           {/* Description */}
           <div className="space-y-2">
             <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Description</h4>
-            <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
+            <p className={`text-sm text-gray-600 leading-relaxed ${showFullDesc ? '' : 'line-clamp-3'}`}>{description}</p>
+            {description && description.length > 150 && (
+              <button
+                onClick={() => setShowFullDesc(!showFullDesc)}
+                className="text-xs font-bold text-luckoptics-primary hover:underline mt-1 cursor-pointer"
+              >
+                {showFullDesc ? 'See Less' : 'See More'}
+              </button>
+            )}
           </div>
 
           {/* Collapsible Specifications Drawer */}
@@ -252,19 +264,19 @@ export default function ProductDetail() {
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-2">
                   <span className="text-gray-400 font-semibold">Frame Width</span>
-                  <span className="font-bold text-gray-800">138 mm</span>
+                  <span className="font-bold text-gray-800">{frameWidth || '138 mm'}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-2">
                   <span className="text-gray-400 font-semibold">Temple Length</span>
-                  <span className="font-bold text-gray-800">140 mm</span>
+                  <span className="font-bold text-gray-800">{templeLength || '140 mm'}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-2">
                   <span className="text-gray-400 font-semibold">Nose Bridge</span>
-                  <span className="font-bold text-gray-800">18 mm</span>
+                  <span className="font-bold text-gray-800">{noseBridge || '18 mm'}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-2">
                   <span className="text-gray-400 font-semibold">Weight</span>
-                  <span className="font-bold text-gray-800">18.5g (Ultra-Light)</span>
+                  <span className="font-bold text-gray-800">{weight || '18.5g (Ultra-Light)'}</span>
                 </div>
               </div>
             </div>

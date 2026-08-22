@@ -122,7 +122,7 @@ export default function Footer() {
       <div className="border-t border-luckoptics-primary/20 bg-black/20 py-6 text-center text-xs text-gray-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p>© {new Date().getFullYear()} LuckOptics Store. All Rights Reserved. 2026</p>
-          <p>Designed with ❤️ by <Link href="https://www.instagram.com/princemishra.09">Prince Mishra</Link></p>
+          {/* <p>Designed with ❤️ by <Link href="https://www.instagram.com/princemishra.09">Prince Mishra</Link></p> */}
         </div>
       </div>
     </footer>
