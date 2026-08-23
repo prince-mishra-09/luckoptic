@@ -13,6 +13,7 @@ const orderRoutes = require('./routes/orders');
 const uploadRoutes = require('./routes/upload');
 const lensRoutes = require('./routes/lenses');
 const paymentMethodRoutes = require('./routes/paymentMethods');
+const sliderRoutes = require('./routes/sliders');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/lenses', lensRoutes);
 app.use('/api/payment-methods', paymentMethodRoutes);
+app.use('/api/sliders', sliderRoutes);
 
 // Root test endpoint
 app.get('/', (req, res) => {

@@ -242,6 +242,7 @@ const eyeglassesShapes = [
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [sliders, setSliders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [hoveredCategory, setHoveredCategory] = useState(null);
@@ -262,6 +263,12 @@ export default function Home() {
         if (prodData.success) {
           setFeaturedProducts(prodData.products);
         }
+
+        const sliderRes = await fetch(`${API_URL}/sliders`);
+        const sliderData = await sliderRes.json();
+        if (sliderData.success && sliderData.sliders.length > 0) {
+          setSliders(sliderData.sliders);
+        }
       } catch (err) {
         console.error('Failed to load API data:', err);
       } finally {
@@ -269,14 +276,6 @@ export default function Home() {
       }
     }
     loadData();
-  }, []);
-
-  // Slide auto-play effect
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev === heroSlides.length - 1 ? 0 : prev + 1));
-    }, 5000);
-    return () => clearInterval(timer);
   }, []);
 
   const fallbackCategories = [
@@ -296,7 +295,7 @@ export default function Home() {
       shape: 'Rectangle',
       frameType: 'Full Rim',
       ratings: 4.8,
-      stock: 10
+      stock: 15
     },
     {
       _id: '2',
@@ -334,18 +333,18 @@ export default function Home() {
   ];
 
   // Slides matching the LuckOptics screenshot style & doctor theme
-  const heroSlides = [
+  const fallbackSliders = [
     {
-      id: 1,
+      id: 'fallback-1',
       title: 'JOHN JACOBS',
-      subtitle: 'HOUSE OF THE DRAGON',
-      desc: 'Exclusive collection featuring premium metal details and hand-crafted acetate templates.',
-      image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=1000&auto=format&fit=crop',
-      btnText: 'Shop Now',
+      subtitle: 'ACTIVE CYCLING GLASSES',
+      desc: 'Aerodynamic design with wrap-around lenses for maximum wind protection and optical clarity.',
+      image: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=1000&auto=format&fit=crop',
+      btnText: 'Explore Cycle Glasses',
       link: '/products?category=Sunglasses'
     },
     {
-      id: 2,
+      id: 'fallback-2',
       title: 'DOCTOR RECOMMENDED',
       subtitle: 'BLUE SHIELD SCREEN PROTECT',
       desc: 'Formulated with clinical precision to block 98% harmful screen radiation. Perfect for digital eye strain.',
@@ -354,108 +353,137 @@ export default function Home() {
       link: '/products?category=Screen%20Glasses'
     },
     {
-      id: 3,
+      id: 'fallback-3',
       title: 'VINCENT CHASE',
       subtitle: 'THE CLINICAL COMFORT SERENE',
       desc: 'Extra lightweight frames with soft hypoallergenic nose pads. Doctor recommended for high-power prescriptions.',
       image: 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?w=1000&auto=format&fit=crop',
       btnText: 'Shop Spectacles',
       link: '/products?category=Eyeglasses'
+    },
+    {
+      id: 'fallback-4',
+      title: 'POLARIZED SERIES',
+      subtitle: 'PREMIUM POLARIZED SUNGLASSES',
+      desc: 'Eliminate glare, enhance colors, and protect your eyes under intense sunlight with our specialized polarized range.',
+      image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=1000&auto=format&fit=crop',
+      btnText: 'Shop Polarized',
+      link: '/products?category=Sunglasses'
     }
   ];
 
   const activeCategories = categories.length > 0 ? categories : fallbackCategories;
   const activeProducts = featuredProducts.length > 0 ? featuredProducts : fallbackProducts;
+  const activeSlides = sliders.length > 0 ? sliders : fallbackSliders;
+
+  // Slide auto-play effect
+  useEffect(() => {
+    const total = activeSlides.length;
+    if (total <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev === total - 1 ? 0 : prev + 1));
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [activeSlides.length]);
 
   const handlePrevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? heroSlides.length - 1 : prev - 1));
+    setCurrentSlide((prev) => (prev === 0 ? activeSlides.length - 1 : prev - 1));
   };
 
   const handleNextSlide = () => {
-    setCurrentSlide((prev) => (prev === heroSlides.length - 1 ? 0 : prev + 1));
+    setCurrentSlide((prev) => (prev === activeSlides.length - 1 ? 0 : prev + 1));
   };
 
   return (
     <div className="space-y-12 pb-16">
       
       {/* 1. LuckOptics Screenshot Style Slider Section */}
-      <section className="relative w-full h-[360px] sm:h-[480px] bg-luckoptics-dark overflow-hidden select-none">
-        
-        {/* Slider Items wrapper */}
-        <div className="w-full h-full relative">
-          {heroSlides.map((slide, idx) => {
-            const isActive = idx === currentSlide;
-            return (
-              <div
-                key={slide.id}
-                className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${
-                  isActive ? 'opacity-100 z-10 translate-x-0' : 'opacity-0 z-0 translate-x-12'
-                }`}
-              >
-                {/* Background image overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent z-10"></div>
-                <img
-                  src={slide.image}
-                  alt={slide.subtitle}
-                  className="w-full h-full object-cover object-center absolute inset-0"
-                />
+      {loading ? (
+        <section className="relative w-full h-[360px] sm:h-[480px] bg-luckoptics-dark flex items-center justify-center select-none">
+          <div className="flex flex-col items-center gap-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Loading Banner...</span>
+          </div>
+        </section>
+      ) : (
+        <section className="relative w-full h-[360px] sm:h-[480px] bg-luckoptics-dark overflow-hidden select-none">
+          
+          {/* Slider Items wrapper */}
+          <div className="w-full h-full relative">
+            {activeSlides.map((slide, idx) => {
+              const isActive = idx === currentSlide;
+              return (
+                <div
+                  key={slide._id || slide.id}
+                  className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${
+                    isActive ? 'opacity-100 z-10 translate-x-0' : 'opacity-0 z-0 translate-x-12'
+                  }`}
+                >
+                  {/* Background image overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent z-10"></div>
+                  <img
+                    src={slide.image}
+                    alt={slide.subtitle}
+                    className="w-full h-full object-cover object-center absolute inset-0"
+                  />
 
-                {/* Content centered exactly matching LuckOptics screenshot layout */}
-                <div className="absolute inset-y-0 left-0 w-full max-w-7xl mx-auto px-6 sm:px-12 flex flex-col justify-center items-start z-20 space-y-4">
-                  <span className="text-[10px] sm:text-xs font-bold tracking-widest text-luckoptics-gold uppercase">
-                    {slide.title}
-                  </span>
-                  <h2 className="font-display font-extrabold text-2xl sm:text-4xl md:text-5xl text-white leading-tight uppercase tracking-wider max-w-lg">
-                    {slide.subtitle}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-gray-300 max-w-md font-medium leading-relaxed hidden sm:block">
-                    {slide.desc}
-                  </p>
-                  <Link
-                    href={slide.link}
-                    className="inline-block bg-white text-luckoptics-dark font-sans font-extrabold text-xs sm:text-sm px-8 py-3 rounded-md hover:bg-luckoptics-primary hover:text-white transition-all shadow-lg mt-2"
-                  >
-                    {slide.btnText}
-                  </Link>
+                  {/* Content centered exactly matching LuckOptics screenshot layout */}
+                  <div className="absolute inset-y-0 left-0 w-full max-w-7xl mx-auto px-6 sm:px-12 flex flex-col justify-center items-start z-20 space-y-4">
+                    <span className="text-[10px] sm:text-xs font-bold tracking-widest text-luckoptics-gold uppercase">
+                      {slide.title}
+                    </span>
+                    <h2 className="font-display font-extrabold text-2xl sm:text-4xl md:text-5xl text-white leading-tight uppercase tracking-wider max-w-lg">
+                      {slide.subtitle}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-gray-300 max-w-md font-medium leading-relaxed hidden sm:block">
+                      {slide.desc}
+                    </p>
+                    <Link
+                      href={slide.link}
+                      className="inline-block bg-white text-luckoptics-dark font-sans font-extrabold text-xs sm:text-sm px-8 py-3 rounded-md hover:bg-luckoptics-primary hover:text-white transition-all shadow-lg mt-2"
+                    >
+                      {slide.btnText}
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        {/* Navigation Arrows */}
-        <button
-          onClick={handlePrevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-25 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors cursor-pointer"
-          aria-label="Previous Slide"
-          suppressHydrationWarning
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <button
-          onClick={handleNextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-25 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors cursor-pointer"
-          aria-label="Next Slide"
-          suppressHydrationWarning
-        >
-          <ChevronRight size={20} />
-        </button>
+          {/* Navigation Arrows */}
+          <button
+            onClick={handlePrevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-25 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors cursor-pointer"
+            aria-label="Previous Slide"
+            suppressHydrationWarning
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button
+            onClick={handleNextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-25 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors cursor-pointer"
+            aria-label="Next Slide"
+            suppressHydrationWarning
+          >
+            <ChevronRight size={20} />
+          </button>
 
-        {/* Pagination Dots */}
-        <div className="absolute bottom-4 left-0 w-full flex justify-center gap-2 z-25">
-          {heroSlides.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              className={`w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${
-                idx === currentSlide ? 'bg-white scale-120' : 'bg-white/40 hover:bg-white/60'
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-              suppressHydrationWarning
-            ></button>
-          ))}
-        </div>
-      </section>
+          {/* Pagination Dots */}
+          <div className="absolute bottom-4 left-0 w-full flex justify-center gap-2 z-25">
+            {activeSlides.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${
+                  idx === currentSlide ? 'bg-white scale-120' : 'bg-white/40 hover:bg-white/60'
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+                suppressHydrationWarning
+              ></button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 2. Top Categories (LuckOptics screenshot style header with shapes hover dropdown) */}
       <section className="max-w-7xl mx-auto px-4 relative">
